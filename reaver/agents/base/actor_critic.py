@@ -1,10 +1,11 @@
+from abc import abstractmethod
+
 import gin.tf
 import numpy as np
 import tensorflow as tf
-from abc import abstractmethod
 
-from reaver.envs.base import Spec
 from reaver.agents.base import MemoryAgent
+from reaver.envs.base import Spec
 from reaver.utils import Logger
 from reaver.utils.tensorflow import SessionManager
 from reaver.utils.typing import ModelBuilder, PolicyType
@@ -36,24 +37,25 @@ class ActorCriticAgent(MemoryAgent):
 
     Extending classes only need to implement loss_fn method
     """
+
     def __init__(
-        self,
-        obs_spec: Spec,
-        act_spec: Spec,
-        model_fn: ModelBuilder=None,
-        policy_cls: PolicyType=None,
-        sess_mgr: SessionManager=None,
-        optimizer: tf.train.Optimizer=None,
-        value_coef=DEFAULTS['value_coef'],
-        entropy_coef=DEFAULTS['entropy_coef'],
-        traj_len=DEFAULTS['traj_len'],
-        batch_sz=DEFAULTS['batch_sz'],
-        discount=DEFAULTS['discount'],
-        gae_lambda=DEFAULTS['gae_lambda'],
-        clip_rewards=DEFAULTS['clip_rewards'],
-        clip_grads_norm=DEFAULTS['clip_grads_norm'],
-        normalize_returns=DEFAULTS['normalize_returns'],
-        normalize_advantages=DEFAULTS['normalize_advantages'],
+            self,
+            obs_spec: Spec,
+            act_spec: Spec,
+            model_fn: ModelBuilder = None,
+            policy_cls: PolicyType = None,
+            sess_mgr: SessionManager = None,
+            optimizer: tf.train.Optimizer = None,
+            value_coef=DEFAULTS['value_coef'],
+            entropy_coef=DEFAULTS['entropy_coef'],
+            traj_len=DEFAULTS['traj_len'],
+            batch_sz=DEFAULTS['batch_sz'],
+            discount=DEFAULTS['discount'],
+            gae_lambda=DEFAULTS['gae_lambda'],
+            clip_rewards=DEFAULTS['clip_rewards'],
+            clip_grads_norm=DEFAULTS['clip_grads_norm'],
+            normalize_returns=DEFAULTS['normalize_returns'],
+            normalize_advantages=DEFAULTS['normalize_advantages'],
     ):
         MemoryAgent.__init__(self, obs_spec, act_spec, traj_len, batch_sz)
 
@@ -128,9 +130,9 @@ class ActorCriticAgent(MemoryAgent):
             np.clip(self.rewards, -self.clip_rewards, self.clip_rewards, out=self.rewards)
 
         rewards = self.rewards.copy()
-        rewards[-1] += (1-self.dones[-1]) * self.discount * bootstrap_value
+        rewards[-1] += (1 - self.dones[-1]) * self.discount * bootstrap_value
 
-        masked_discounts = self.discount * (1-self.dones)
+        masked_discounts = self.discount * (1 - self.dones)
 
         returns = self.discounted_cumsum(rewards, masked_discounts)
 
@@ -169,9 +171,10 @@ class ActorCriticAgent(MemoryAgent):
     def discounted_cumsum(x, discount):
         y = np.zeros_like(x)
         y[-1] = x[-1]
-        for t in range(x.shape[0]-2, -1, -1):
-            y[t] = x[t] + discount[t] * y[t+1]
+        for t in range(x.shape[0] - 2, -1, -1):
+            y[t] = x[t] + discount[t] * y[t + 1]
         return y
 
     @abstractmethod
-    def loss_fn(self): ...
+    def loss_fn(self):
+        ...

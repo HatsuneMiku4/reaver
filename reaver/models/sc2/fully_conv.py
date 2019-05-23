@@ -1,9 +1,9 @@
 import gin
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras import Model
-from tensorflow.keras.initializers import VarianceScaling
-from tensorflow.keras.layers import Input, Concatenate, Dense, Embedding, Conv2D, Flatten, Lambda
+from tensorflow.python.keras import Model
+from tensorflow.python.keras.initializers import VarianceScaling
+from tensorflow.python.keras.layers import Input, Concatenate, Dense, Embedding, Conv2D, Flatten, Lambda
 from reaver.models.base.layers import Squeeze, Split, Transpose, Log, Broadcast2D
 
 

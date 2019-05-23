@@ -57,7 +57,8 @@ class SC2Env(Env):
                 'screen': ['player_relative', 'selected', 'visibility_map', 'unit_hit_points_ratio', 'unit_density'],
                 'minimap': ['player_relative', 'selected', 'visibility_map', 'camera'],
                 # available actions should always be present and in first position
-                'non-spatial': ['available_actions', 'player']}
+                'non-spatial': ['available_actions', 'player'],  # 'last_actions'
+            }
 
         self.act_wrapper = ActionWrapper(spatial_dim, action_ids)
         self.obs_wrapper = ObservationWrapper(obs_features, action_ids)
@@ -134,6 +135,7 @@ class SC2Env(Env):
 
 
 class ObservationWrapper:
+    # noinspection PyProtectedMember
     def __init__(self, _features=None, action_ids=None):
         self.spec = None
         self.features = _features
@@ -170,6 +172,7 @@ class ObservationWrapper:
 
         default_dims = {
             'available_actions': (len(self.action_ids), ),
+            'last_actions': (len(self.action_ids),),
         }
 
         screen_shape = (len(self.features['screen']), *spec['feature_screen'][1:])
