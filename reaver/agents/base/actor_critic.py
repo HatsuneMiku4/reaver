@@ -79,6 +79,7 @@ class ActorCriticAgent(MemoryAgent):
         self.policy = policy_cls(act_spec, self.model.outputs[:-1])
         self.loss_op, self.loss_terms, self.loss_inputs = self.loss_fn()
 
+        # noinspection PyShadowingBuiltins
         grads, vars = zip(*optimizer.compute_gradients(self.loss_op))
         self.grads_norm = tf.global_norm(grads)
         if clip_grads_norm > 0.:

@@ -67,6 +67,7 @@ def main(argv):
     if not args.gpu:
         args.gin_bindings.append("build_cnn_nature.data_format = 'channels_last'")
         args.gin_bindings.append("build_fully_conv.data_format = 'channels_last'")
+        args.gin_bindings.append("build_relational.data_format = 'channels_last'")
 
     gin.parse_config_files_and_bindings(gin_files, args.gin_bindings)
     args.n_envs = min(args.n_envs, gin.query_parameter('ACAgent.batch_sz'))

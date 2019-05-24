@@ -1,0 +1,23 @@
+ACAgent.model_fn = @build_relational
+ACAgent.policy_cls = @SC2RelationalMultiPolicy
+
+#########################################
+
+ACAgent.discount = 0.99
+ACAgent.batch_sz = 32
+# TODO: unroll length = 80
+# TODO: baseline loss scaling = 0.1
+ACAgent.clip_grads_norm = 100.0
+
+#########################################
+
+ACAgent.optimizer = @tf.train.AdamOptimizer()
+# TODO: determine AdamOpt learning rate
+tf.train.AdamOptimizer.learning_rate = 0.0007
+tf.train.AdamOptimizer.beta1 = 0.9
+tf.train.AdamOptimizer.beta2 = 0.999
+tf.train.AdamOptimizer.epsilon = 1e-08
+
+# TODO: determine spatial dimension
+SC2Env.spatial_dim = 32
+SC2Env.action_ids = 'minigames_all'
