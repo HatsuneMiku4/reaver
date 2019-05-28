@@ -32,6 +32,8 @@ flags.DEFINE_bool('test', False,
                   'Run an agent in test mode: restore flag is set to true and number of envs set to 1'
                   'Loss is calculated, but gradients are not applied.'
                   'Checkpoints, summaries, log files are not updated, but console logger is enabled.')
+flags.DEFINE_bool('relational', False,
+                  'Run a relational DRL agent')
 
 flags.DEFINE_alias('e', 'env')
 flags.DEFINE_alias('a', 'agent')
@@ -76,7 +78,12 @@ def main(argv):
     sess_mgr = rvr.utils.tensorflow.SessionManager(sess, expt.path, args.ckpt_freq, training_enabled=not args.test)
 
     env_cls = rvr.envs.GymEnv if '-v' in args.env else rvr.envs.SC2Env
-    env = env_cls(args.env, args.render, max_ep_len=args.max_ep_len)
+    obs_features = {
+        'screen': ['player_relative', 'selected', 'visibility_map', 'unit_hit_points_ratio', 'unit_density'],
+        'minimap': ['player_relative', 'selected', 'visibility_map', 'camera'],
+        'non-spatial': ['available_actions', 'player', 'last_actions'],
+    } if args.relational else None
+    env = env_cls(args.env, args.render, max_ep_len=args.max_ep_len, obs_features=obs_features)
 
     agent = rvr.agents.registry[args.agent](env.obs_spec(), env.act_spec(), sess_mgr=sess_mgr, n_envs=args.n_envs)
     agent.logger = rvr.utils.StreamLogger(args.n_envs, args.log_freq, args.log_eps_avg, sess_mgr, expt.log_path)

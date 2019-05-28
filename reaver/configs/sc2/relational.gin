@@ -6,13 +6,15 @@ ACAgent.policy_cls = @SC2RelationalMultiPolicy
 ACAgent.discount = 0.99
 ACAgent.batch_sz = 32
 # TODO: unroll length = 80
+ACAgent.traj_len = 80
 # TODO: baseline loss scaling = 0.1
+# TODO: entropy loss scaling: 1e-1, 1e-2, 1e-3
 ACAgent.clip_grads_norm = 100.0
 
 #########################################
 
 ACAgent.optimizer = @tf.train.AdamOptimizer()
-# TODO: determine AdamOpt learning rate
+# TODO: determine AdamOpt learning rate: [1e-4, 1e-5]
 tf.train.AdamOptimizer.learning_rate = 0.0007
 tf.train.AdamOptimizer.beta1 = 0.9
 tf.train.AdamOptimizer.beta2 = 0.999
