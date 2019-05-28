@@ -46,7 +46,7 @@ flags.DEFINE_alias('n', 'experiment')
 flags.DEFINE_alias('g', 'gin_bindings')
 
 
-def main(argv):
+def main():
     args = flags.FLAGS
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
     os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
@@ -83,7 +83,10 @@ def main(argv):
         'minimap': ['player_relative', 'selected', 'visibility_map', 'camera'],
         'non-spatial': ['available_actions', 'player', 'last_actions'],
     } if args.relational else None
-    env = env_cls(args.env, args.render, max_ep_len=args.max_ep_len, obs_features=obs_features)
+
+    # TODO: set spatial_dim <- 64
+    spatial_dim = 32 if args.relational else 16
+    env = env_cls(args.env, args.render, max_ep_len=args.max_ep_len, obs_features=obs_features, spatial_dim=spatial_dim)
 
     agent = rvr.agents.registry[args.agent](env.obs_spec(), env.act_spec(), sess_mgr=sess_mgr, n_envs=args.n_envs)
     agent.logger = rvr.utils.StreamLogger(args.n_envs, args.log_freq, args.log_eps_avg, sess_mgr, expt.log_path)

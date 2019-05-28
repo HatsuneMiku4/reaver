@@ -1,6 +1,7 @@
 import gin
 import tensorflow as tf
 from reaver.models.base import MultiPolicy
+from reaver.models.base.layers import Broadcast2D
 from .relational import *
 
 
@@ -25,7 +26,6 @@ class SC2MultiPolicy(MultiPolicy):
 #     outputs=logits + [value]
 # )
 
-# TODO: implement Relational MultiPolicy
 # see agents/a2c.py
 # tf_inputs = self.model.inputs + self.policy.inputs + self.loss_inputs
 # self.policy = policy_cls(act_spec, self.model.outputs[:-1])
