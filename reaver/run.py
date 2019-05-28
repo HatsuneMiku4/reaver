@@ -46,7 +46,7 @@ flags.DEFINE_alias('n', 'experiment')
 flags.DEFINE_alias('g', 'gin_bindings')
 
 
-def main():
+def main(argv):
     args = flags.FLAGS
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
     os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu

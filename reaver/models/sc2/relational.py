@@ -14,6 +14,8 @@ from reaver.models.base.layers import (
 )
 
 
+# TODO: clip loss
+
 @gin.configurable
 def build_relational(obs_spec, act_spec, data_format='channels_first', broadcast_non_spatial=False, **unused_args):
     # https://github.com/deepmind/pysc2/blob/master/docs/environment.md#last-actions
