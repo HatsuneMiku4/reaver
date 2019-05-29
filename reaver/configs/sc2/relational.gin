@@ -4,7 +4,7 @@ ACAgent.policy_cls = @SC2RelationalMultiPolicy
 #########################################
 
 ACAgent.discount = 0.99
-ACAgent.batch_sz = 32
+ACAgent.batch_sz = 30
 # TODO: unroll length = 80
 ACAgent.traj_len = 80
 # TODO: baseline loss scaling = 0.1

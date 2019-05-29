@@ -9,6 +9,10 @@ class MemoryAgent(RunningAgent):
     where B is batch size, T is trajectory length
     and ? is either 1 (None) for rewards/dones or act/obs shapes
     """
+
+    def get_action(self, obs):
+        raise NotImplementedError
+
     def __init__(self, obs_spec: Spec, act_spec: Spec, traj_len, batch_sz):
         RunningAgent.__init__(self)
 

@@ -86,11 +86,12 @@ def main(argv):
 
     # TODO: set spatial_dim <- 64
     spatial_dim = 32 if args.relational else 16
+    batch_sz = 30 if args.relational else None
     env = env_cls(args.env, args.render, max_ep_len=args.max_ep_len, obs_features=obs_features, spatial_dim=spatial_dim)
 
     policy_cls = rvr.models.SC2RelationalMultiPolicy if args.relational else rvr.models.SC2MultiPolicy
     model_fn = rvr.models.build_relational if args.relational else rvr.models.build_fully_conv
-    agent = rvr.agents.registry[args.agent](env.obs_spec(), env.act_spec(),
+    agent = rvr.agents.registry[args.agent](env.obs_spec(), env.act_spec(), batch_sz=batch_sz,
                                             sess_mgr=sess_mgr, n_envs=args.n_envs,
                                             model_fn=model_fn, policy_cls=policy_cls)
     agent.logger = rvr.utils.StreamLogger(args.n_envs, args.log_freq, args.log_eps_avg, sess_mgr, expt.log_path)
