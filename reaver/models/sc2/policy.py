@@ -31,6 +31,7 @@ class SC2MultiPolicy(MultiPolicy):
 # self.policy = policy_cls(act_spec, self.model.outputs[:-1])
 # self.sess_mgr.run([self.policy.sample, self.value], self.model.inputs, obs)
 
+@gin.configurable
 class SC2RelationalMultiPolicy(MultiPolicy):
 
     # noinspection PyMissingConstructor
