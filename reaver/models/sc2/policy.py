@@ -65,7 +65,7 @@ class SC2RelationalMultiPolicy(MultiPolicy):
 
         self.logits = [policy_logits, ]
         data_format = 'channels_first'     # TODO: refactor me
-        for space in list(act_spec)[1:]:  # [0]: function_id
+        for space in list(act_spec)[1:]:   # [0]: function_id
             if space.is_spatial():
                 conv_layer = Conv2D(1, 1, **conv_cfg(data_format, scale=0.1))
                 logits.append(conv_layer(action_logits))
@@ -78,7 +78,7 @@ class SC2RelationalMultiPolicy(MultiPolicy):
         self.entropy = sum([dist.entropy() for dist in self.dists])
         self.sample = [policy_sample, ] + [dist.sample() for dist in self.dists[1:]]
         args_mask = tf.constant(act_spec.spaces[0].args_mask, dtype=tf.float32)
-        self.inputs = [Input([*s.shape], dtype=s.dtype) for s in act_spec]
+        self.inputs = [tf.placeholder(s.dtype, [None, *s.shape]) for s in act_spec]
         act_args_mask = tf.gather(args_mask, self.inputs[0])  # masked action_id
         act_args_mask = tf.transpose(act_args_mask, [1, 0])
         self.logli = self.dists[0].log_prob(self.inputs[0])
