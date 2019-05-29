@@ -53,6 +53,8 @@ class ShmProcEnv(Env):
                     obs = self._env.reset()
                     # print(self.shm)
                     # print(obs)
+                    for shm, _obs in zip(self.shm, obs + [0, 0]):
+                        print(shm.shape, _obs.shape)
                     for shm, ob in zip(self.shm, obs + [0, 0]):
                         try:
                             np.copyto(dst=shm[self.idx], src=ob)

@@ -158,7 +158,7 @@ class ObservationWrapper:
             obs['feature_minimap'][self.feature_masks['minimap']]
         ]
         for feat_name in self.features['non-spatial']:
-            if feat_name == 'available_actions':
+            if feat_name in ['available_actions', 'last_actions']:
                 fn_ids_idxs = [i for i, fn_id in enumerate(self.action_ids) if fn_id in obs[feat_name]]
                 mask = np.zeros((len(self.action_ids),), dtype=np.int32)
                 mask[fn_ids_idxs] = 1
