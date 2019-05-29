@@ -15,7 +15,7 @@ class MemoryAgent(RunningAgent):
 
     def __init__(self, obs_spec: Spec, act_spec: Spec, traj_len, batch_sz):
         RunningAgent.__init__(self)
-
+        print('Memory Agent: batch_sz:', batch_sz)
         self.traj_len = traj_len
         self.batch_sz = batch_sz
         self.shape = (traj_len, batch_sz)
