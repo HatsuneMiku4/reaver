@@ -64,7 +64,7 @@ class SC2RelationalMultiPolicy(MultiPolicy):
         )
 
         self.logits = [policy_logits, ]
-        data_format = 'channel_first'     # TODO: refactor me
+        data_format = 'channels_first'     # TODO: refactor me
         for space in list(act_spec)[1:]:  # [0]: function_id
             if space.is_spatial():
                 conv_layer = Conv2D(1, 1, **conv_cfg(data_format, scale=0.1))
