@@ -10,14 +10,12 @@ from tensorflow.python.keras.layers import (
 from tensorflow.python.keras.layers.merge import add
 
 from reaver.models.base.layers import (
-    Squeeze, Split, Transpose, Log
+    Squeeze, Split, Transpose, Log, Broadcast2D
 )
 
 
-# TODO: clip loss
-
 @gin.configurable
-def build_relational(obs_spec, act_spec, data_format='channels_first', broadcast_non_spatial=False, **unused_args):
+def build_relational(obs_spec, act_spec, data_format='channels_first', broadcast_non_spatial=False, fc_dim=256):
     # https://github.com/deepmind/pysc2/blob/master/docs/environment.md#last-actions
     # obs_spec: screen, minimap, player (11,), last_actions (n,)
     # At each time step agents are presented with 4 sources of information:
@@ -28,6 +26,7 @@ def build_relational(obs_spec, act_spec, data_format='channels_first', broadcast
     channel_3 = 16
     channel_2 = 96
 
+    # TODO: set spatial_dim <- 64
     screen, screen_input = spatial_block(
         'screen', obs_spec.spaces[0],
         conv_cfg(data_format, 'relu'),
@@ -39,6 +38,7 @@ def build_relational(obs_spec, act_spec, data_format='channels_first', broadcast
         batch_size=batch_size
     )
 
+    # TODO: obs_spec[2:] <- ['available_actions', 'player', 'last_actions']
     non_spatial_inputs_list = [
         Input(s.shape, batch_size=batch_size)
         for s in obs_spec.spaces[2:]
@@ -59,13 +59,19 @@ def build_relational(obs_spec, act_spec, data_format='channels_first', broadcast
 
     # TODO: treat channel_x as parameters or read from configuration files
 
+    class ExpandDims(Lambda):
+        def __init__(self, axis):
+            Lambda.__init__(self, lambda x: tf.expand_dims(x, axis))
+
+    input_3d = ExpandDims(axis=1)(input_3d)
+
     # output_3d: [30, 1, 96, 8, 8]
     output_3d = ConvLSTM2D(
         filters=channel_2,
         kernel_size=3,
         stateful=True,  # TODO: unroll length
         **conv2dlstm_cfg()
-    )(tf.expand_dims(input_3d, axis=1))
+    )(input_3d)
 
     # relational_spatial: [30, 32, 8, 8]
     relational_spatial = _resnet12(
@@ -110,6 +116,7 @@ def build_relational(obs_spec, act_spec, data_format='channels_first', broadcast
     )
     policy_logits = mask_actions(policy_logits)
 
+    # TODO: check
     return Model(
         inputs=[screen_input, minimap_input] + non_spatial_inputs_list,
         outputs=[shared_features, policy_logits, relational_spatial, value]
@@ -203,6 +210,7 @@ def dense_cfg(activation=None, scale=1.0):
 
 
 def conv2dlstm_cfg(data_format='channels_first', scale=1.0):
+    # TODO: check scale factor
     return dict(
         padding='same',
         data_format=data_format,
