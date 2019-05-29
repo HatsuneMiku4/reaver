@@ -54,7 +54,10 @@ class ShmProcEnv(Env):
                     print(self.shm)
                     print(obs)
                     for shm, ob in zip(self.shm, obs + [0, 0]):
-                        np.copyto(dst=shm[self.idx], src=ob)
+                        try:
+                            np.copyto(dst=shm[self.idx], src=ob)
+                        except ValueError:
+                            print(shm[self.idx], ob)
                     self.w_conn.send(DONE)
                 elif msg == STOP:
                     self._env.stop()
