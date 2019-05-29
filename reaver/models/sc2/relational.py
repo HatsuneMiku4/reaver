@@ -15,7 +15,7 @@ from reaver.models.base.layers import (
 
 
 @gin.configurable
-def build_relational(obs_spec, act_spec, data_format='channels_first', broadcast_non_spatial=False, fc_dim=256):
+def build_relational(obs_spec, act_spec, data_format='channels_first', broadcast_non_spatial=False):
     # https://github.com/deepmind/pysc2/blob/master/docs/environment.md#last-actions
     # obs_spec: screen, minimap, player (11,), last_actions (n,)
     # At each time step agents are presented with 4 sources of information:

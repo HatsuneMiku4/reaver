@@ -51,13 +51,14 @@ class ShmProcEnv(Env):
                     self.w_conn.send(DONE)
                 elif msg == RESET:
                     obs = self._env.reset()
-                    print(self.shm)
-                    print(obs)
+                    # print(self.shm)
+                    # print(obs)
                     for shm, ob in zip(self.shm, obs + [0, 0]):
                         try:
                             np.copyto(dst=shm[self.idx], src=ob)
                         except ValueError:
                             print(shm[self.idx], ob)
+                            raise
                     self.w_conn.send(DONE)
                 elif msg == STOP:
                     self._env.stop()
