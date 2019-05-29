@@ -49,7 +49,7 @@ class SC2RelationalMultiPolicy(MultiPolicy):
 
         # action_embed: [30, 16]
         action_embed = Embedding(
-            policy_logits.shape[-1], 16
+            int(policy_logits.shape[-1]), 16
         )(policy_sample)
 
         # action_logits: [30, 16+16, 32, 32]
