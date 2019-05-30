@@ -81,13 +81,12 @@ class SC2RelationalMultiPolicy(MultiPolicy):
         self.entropy = sum([dist.entropy() for dist in self.dists])
         self.sample = [policy_sample, ] + [dist.sample() for dist in self.dists[1:]]
         args_mask = tf.constant(act_spec.spaces[0].args_mask, dtype=tf.float32)  # (23, 11)
-        self.inputs = [tf.placeholder(s.dtype, [None, *s.shape]) for s in list(act_spec)[1:]]
-        act_args_mask = tf.gather(args_mask, policy_sample)  # masked action_id
+        self.inputs = [tf.placeholder(s.dtype, [None, *s.shape]) for s in list(act_spec)]
+        act_args_mask = tf.gather(args_mask, self.inputs[0])  # masked action_id
         act_args_mask = tf.transpose(act_args_mask, [1, 0])
 
-        # self.logli = self.dists[0].log_prob(self.inputs[0])
-        self.logli = self.dists[0].log_prob(policy_sample)
+        self.logli = self.dists[0].log_prob(self.inputs[0])
         for i in range(1, len(self.dists)):
-            self.logli += act_args_mask[i - 1] * self.dists[i].log_prob(self.inputs[i-1])
+            self.logli += act_args_mask[i - 1] * self.dists[i].log_prob(self.inputs[i])
 
 
