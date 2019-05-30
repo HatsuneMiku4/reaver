@@ -66,24 +66,28 @@ class SC2RelationalMultiPolicy(MultiPolicy):
 
         self.logits = [policy_logits, ]
         data_format = 'channels_first'     # TODO: refactor me
-        for space in list(act_spec)[1:]:   # [0]: function_id
+        for space in list(act_spec.spaces)[1:]:   # [0]: function_id
             if space.is_spatial():
                 conv_layer = Conv2D(1, 1, **conv_cfg(data_format, scale=0.1))
-                logits.append(conv_layer(action_logits))
-                logits[-1] = Flatten()(logits[-1])
+                spatial_param_logit = conv_layer(action_logits)
+                self.logits.append(spatial_param_logit)
+                self.logits[-1] = Flatten()(self.logits[-1])
             else:
                 fc_layer = Dense(space.size(), **dense_cfg(scale=0.1))
-                logits.append(fc_layer(conditioned_shared_feature))
+                self.logits.append(fc_layer(conditioned_shared_feature))
 
-        self.dists = [self.make_dist(s, l) for s, l in zip(act_spec.spaces, self.logits)]
+        self.dists = [policy_dist, ] + [self.make_dist(s, l) for s, l in zip(act_spec.spaces[1:], self.logits[1:])]
+        # self.dists = [self.make_dist(s, l) for s, l in zip(act_spec.spaces, self.logits)]
         self.entropy = sum([dist.entropy() for dist in self.dists])
         self.sample = [policy_sample, ] + [dist.sample() for dist in self.dists[1:]]
-        args_mask = tf.constant(act_spec.spaces[0].args_mask, dtype=tf.float32)
-        self.inputs = [tf.placeholder(s.dtype, [None, *s.shape]) for s in act_spec]
-        act_args_mask = tf.gather(args_mask, self.inputs[0])  # masked action_id
+        args_mask = tf.constant(act_spec.spaces[0].args_mask, dtype=tf.float32)  # (23, 11)
+        self.inputs = [tf.placeholder(s.dtype, [None, *s.shape]) for s in list(act_spec)[1:]]
+        act_args_mask = tf.gather(args_mask, policy_sample)  # masked action_id
         act_args_mask = tf.transpose(act_args_mask, [1, 0])
-        self.logli = self.dists[0].log_prob(self.inputs[0])
+
+        # self.logli = self.dists[0].log_prob(self.inputs[0])
+        self.logli = self.dists[0].log_prob(policy_sample)
         for i in range(1, len(self.dists)):
-            self.logli += act_args_mask[i - 1] * self.dists[i].log_prob(self.inputs[i])
+            self.logli += act_args_mask[i - 1] * self.dists[i].log_prob(self.inputs[i-1])
 
 

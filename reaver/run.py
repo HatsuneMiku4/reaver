@@ -4,6 +4,7 @@ import tensorflow as tf
 from absl import app, flags
 
 import reaver as rvr
+from reaver.envs.sc2 import ACTIONS_ALL
 
 flags.DEFINE_string('env', None, 'Either Gym env id or PySC2 map name to run agent in.')
 flags.DEFINE_string('agent', 'a2c', 'Name of the agent. Must be one of (a2c, ppo).')
@@ -86,6 +87,7 @@ def main(argv):
 
     # TODO: set spatial_dim <- 64
     spatial_dim = 32 if args.relational else 16
+    action_id = ACTIONS_ALL if args.relational else None
     env = env_cls(args.env, args.render, max_ep_len=args.max_ep_len, obs_features=obs_features, spatial_dim=spatial_dim)
 
     agent = rvr.agents.registry[args.agent](env.obs_spec(), env.act_spec(),

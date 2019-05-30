@@ -22,7 +22,7 @@ def build_relational(obs_spec, act_spec, data_format='channels_first', broadcast
     # minimap, screen, player, and previous-action.
     assert broadcast_non_spatial is False, 'broadcast_non_spatial should be false for relational agents'
 
-    batch_size = 30
+    batch_size = None
     channel_3 = 16
     channel_2 = 96
 
@@ -63,15 +63,19 @@ def build_relational(obs_spec, act_spec, data_format='channels_first', broadcast
         def __init__(self, axis):
             Lambda.__init__(self, lambda x: tf.expand_dims(x, axis))
 
-    input_3d = ExpandDims(axis=1)(input_3d)
+    # input_3d = ExpandDims(axis=1)(input_3d)
 
-    # output_3d: [30, 1, 96, 8, 8]
-    output_3d = ConvLSTM2D(
-        filters=channel_2,
-        kernel_size=3,
-        stateful=True,  # TODO: unroll length
-        **conv2dlstm_cfg()
-    )(input_3d)
+    # # output_3d: [30, 96, 8, 8]
+    # # TODO: unroll length
+    # output_3d = ConvLSTM2D(
+    #     filters=channel_2,
+    #     kernel_size=3,
+    #     stateful=True,
+    #     **conv2dlstm_cfg()
+    # )(input_3d)
+
+    output_3d = Conv2D(32, 3, **conv_cfg(data_format, 'relu'))(input_3d)
+    output_3d = Conv2D(96, 3, **conv_cfg(data_format, 'relu'))(output_3d)
 
     # relational_spatial: [30, 32, 8, 8]
     relational_spatial = _resnet12(
@@ -99,11 +103,13 @@ def build_relational(obs_spec, act_spec, data_format='channels_first', broadcast
         axis=1, name='shared_features'
     )([relational_nonspatial, input_2d])  # [512+64, ]
 
-    # [30, 1]
+    # [30,]
     value = _mlp2(
         shared_features, units=[256, 1],
         cfg=dense_cfg('relu', scale=0.1)
     )
+    value = Squeeze(axis=-1)(value)
+
     # [30, #actions=549]
     policy_logits = _mlp2(
         shared_features, units=[512, list(act_spec)[0].size()],

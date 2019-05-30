@@ -84,7 +84,9 @@ class SC2Env(Env):
 
     def step(self, action):
         try:
-            obs, reward, done = self.obs_wrapper(self._env.step(self.act_wrapper(action)))
+            wrapped_act = self.act_wrapper(action)
+            obs = self._env.step(wrapped_act)
+            obs, reward, done = self.obs_wrapper(obs)
         except protocol.ConnectionError:
             # hacky fix from websocket timeout issue...
             # this results in faulty reward signals, but I guess it beats completely crashing...
