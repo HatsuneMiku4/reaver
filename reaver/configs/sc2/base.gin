@@ -1,3 +1,6 @@
+SC2Env.spatial_dim = 32
+SC2Env.action_ids = 'minigames_all'
+
 # params for generic actor-critic:
 # ==========================================
 ACAgent.model_fn = @build_fully_conv
